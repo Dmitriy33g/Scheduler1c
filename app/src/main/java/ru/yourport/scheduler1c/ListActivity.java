@@ -98,31 +98,33 @@ public class ListActivity extends AppCompatActivity {
         String[][] result;
         String ERROR = "";
 
+        TextView tvError = findViewById(R.id.tvError);
+
         try {
             Log.d(LOG_TAG, "Try to get result");
             result = dl.get();
             Log.d(LOG_TAG, "get returns " + result.length);
-            //Toast.makeText(this, "get returns " + result.length, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Время выполнения " + dl.getTimeEnd(), Toast.LENGTH_LONG).show();
         } catch (InterruptedException e) {
-            ERROR = e.getMessage();
-            Toast.makeText(this, "Ошибка: " + ERROR, Toast.LENGTH_LONG).show();
+            ERROR = "InterruptedException: " + e.getMessage();
+            tvError.setText(ERROR);
             e.printStackTrace();
             return;
         } catch (ExecutionException e) {
-            ERROR = e.getMessage();
-            Toast.makeText(this, "Ошибка: " + ERROR, Toast.LENGTH_LONG).show();
+            ERROR = "ExecutionException: " + e.getMessage();
+            tvError.setText(ERROR);
             e.printStackTrace();
             return;
         }
-        ERROR = dl.getERROR();
-        Toast.makeText(this, "Ошибка: " + ERROR, Toast.LENGTH_LONG).show();
 
-        TextView tvError = findViewById(R.id.tvError);
-        tvError.setText(ERROR);
-        //tvName.setText(s);
-        //Object obj = new JSON
-        //tvName.setText(name);
-        //String[] names = {"1"};
+        ERROR = dl.getERROR();
+        if (ERROR != "") {
+            tvError.setText(ERROR);
+            Toast.makeText(this, "Ошибка DataLoader: " + ERROR, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        tvError.setVisibility(View.GONE);
 
         //ArrayList ss = new ArrayList();
         //ss.add("Тест1");

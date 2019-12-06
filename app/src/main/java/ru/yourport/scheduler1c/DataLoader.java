@@ -2,7 +2,6 @@ package ru.yourport.scheduler1c;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,6 +25,10 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
         return ERROR;
     }
 
+    public long getTimeEnd() {
+        return TimeEnd;
+    }
+
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -38,10 +41,6 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
     protected void onPostExecute(String[][] strings) {
         super.onPostExecute(strings);
 
-        Date date = new Date();
-        TimeEnd = date.getTime() - TimeStart;
-
-        Log.d(LOG_TAG, "Результат времени в милисекундах: " + TimeEnd);
     }
 
     @Override
@@ -87,6 +86,8 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
             envelope.implicitTypes = true;
             envelope.setOutputSoapObject(request);
 
+            SSLConnection.allowAllSSL();
+
             HttpTransportBasicAuthSE androidHttpTransport = new HttpTransportBasicAuthSE(
                     URL, LOGIN, PASSWORD);
             androidHttpTransport.debug = true;
@@ -103,11 +104,6 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
                 JSONArray ja = jsonObject.getJSONArray("МассивОрганизаций");
 
                 resultString = new String[ja.length()+1][3];
-                //for (String j : ja) {
-                //
-                //}
-
-                //Map<String, String> m;
 
                 resultString[0][1] = jsonObject.getString("Текст");
                 for (int i = 0; i < ja.length(); i++) {
@@ -145,6 +141,10 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
         }
 
         //System.out.println(resultString);
+        Date date = new Date();
+        TimeEnd = date.getTime() - TimeStart;
+
+        Log.d(LOG_TAG, "Результат времени в милисекундах: " + TimeEnd);
 
         return resultString;
     }
