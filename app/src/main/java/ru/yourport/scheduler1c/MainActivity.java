@@ -25,11 +25,23 @@ import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import okhttp3.Authenticator;
 import okhttp3.Credentials;
 import okhttp3.FormBody;
 import okhttp3.Headers;
@@ -38,12 +50,15 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import retrofit2.Retrofit;
+import okhttp3.Route;
+//import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     final String LOG_TAG = "myLogs";
     EditText etLogin, etPassword;
+
+    OkHttpClient client = new OkHttpClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,58 +109,27 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     public void onClick3(View view) {
         Log.d("myLogs","OK");
-        Retrofit retrofit = null;
 
-//        OkHttpClient client = new OkHttpClient.Builder()
-//                .readTimeout(300, TimeUnit.SECONDS)
-//                .addInterceptor(new BasicAuthInterceptor("wsChangeServis", "Service2018"))
-//                .build();
-//
-//        retrofit = new Retrofit.Builder()
-//                .baseUrl("https://kamaz.ddns.net:10100/testut/hs/ExchangeTFK/query")
-//                .client(client)
-//                .build();
+        new AsyncTask<Void, String, String>() {
+        @Override
+        protected String doInBackground(Void... voids) {
+            String s = "";
+            try {
+                Authenticate();
+                run();
+            } catch (Exception e) {
+                Log.d("myLogs","Error: " + e.getMessage());
+                e.printStackTrace();
+            }
+                return s;
+            }
 
-        //SSLConnection.allowAllSSL();
-//        OkHttpClient client = new OkHttpClient();
-//        //RequestBody formBody = new FormBody.Builder()
-//        //        .build();
-//        try {
-//            //.url("https://kamaz.ddns.net:10100/testut/hs/ExchangeTFK/query")
-//            Request request = new Request.Builder()
-//                    .url("https://publicobject.com/helloworld.txt")
-//                    .build();
-//
-//            Response response = client.newCall(request).execute();
-//            String serverAnswer = response.body().string();
-//            Log.d("myLogs","Result: " + serverAnswer);
-//        } catch (IOException e) {
-//            Log.d("myLogs","Error: " + e.getMessage());
-//            e.printStackTrace();
-//        }
-        try {
-            run();
-        } catch (Exception e) {
-            e.printStackTrace();
+        @Override
+        protected void onPostExecute(final String result) {
+
         }
-//                            new AsyncTask<Void, String, String>() {
-//                                @Override
-//                                protected String doInBackground(Void... voids) {
-//                                    String s = "";
-//                                    try {
-//                                        s = doGet("https://kamaz.ddns.net:10100/testut/hs/ExchangeTFK/query");
-//                                    } catch (Exception e) {
-//                                        Log.d("myLogs","Error: " + e.getMessage());
-//                                        e.printStackTrace();
-//                                    }
-//                                    return s;
-//                                }
-//
-//                                @Override
-//                                protected void onPostExecute(final String result) {
-//
-//                                }
-//                            }.execute();
+
+        }.execute();
 
     }
 
@@ -177,10 +161,69 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
+    public SSLSocketFactory sslSocket() {
+        X509TrustManager trustManager;
+        TrustManager[] trustManagers;
+        SSLSocketFactory sslSocketFactory;
+        try {
+            trustManagers = new TrustManager[]{new SSLConnection._FakeX509TrustManager()};
+            trustManager = (X509TrustManager) trustManagers[0];
+
+            //if (trustManagers == null) {
+            //    trustManagers = new TrustManager[]{new SSLConnection._FakeX509TrustManager()};
+            //}
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, new TrustManager[] { trustManager }, new SecureRandom());
+            sslSocketFactory = sslContext.getSocketFactory();
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+
+        //client = new OkHttpClient.Builder()
+        //        .sslSocketFactory(sslSocketFactory)
+        //        .build();
+        return sslSocketFactory;
+    }
+
+    public void Authenticate() {
+        client = new OkHttpClient.Builder()
+                .readTimeout(300, TimeUnit.SECONDS)
+                .hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                })
+                .sslSocketFactory(sslSocket())
+                .authenticator(new Authenticator() {
+                    @Override
+                    public Request authenticate(Route route, Response response) throws IOException {
+                        if (response.request().header("Authorization") != null) {
+                            return null; // Give up, we've already attempted to authenticate.
+                        }
+
+                        //System.out.println("Authenticating for response: " + response);
+                        //System.out.println("Challenges: " + response.challenges());
+                        //String credential = Credentials.basic("jesse", "password1");
+                        String credential = Credentials.basic("wsChangeServis", "Service2018");
+                        return response.request().newBuilder()
+                                .header("Authorization", credential)
+                                .build();
+                    }
+                })
+                .build();
+    }
+
     public void run() throws Exception {
-        final OkHttpClient client = new OkHttpClient();
+        RequestBody formBody = new FormBody.Builder()
+                .add("query", "ListOrganization")
+                .add("g", "test")
+                .build();
+
         Request request = new Request.Builder()
-                .url("https://publicobject.com/helloworld.txt")
+                .url("https://kamaz.ddns.net:10100/testut/hs/ExchangeTFK/query")
+                //.addHeader("gg", "test2")
+                .post(formBody)
                 .build();
 
         try {
@@ -190,6 +233,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             Headers responseHeaders = response.headers();
             for (int i = 0; i < responseHeaders.size(); i++) {
                 //System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
+                Log.d("myLogs",responseHeaders.name(i) + ": " + responseHeaders.value(i));
             }
             Log.d("myLogs","Result: " + response.body().string());
             //System.out.println(response.body().string());
@@ -199,44 +243,4 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
-    class BasicAuthInterceptor implements Interceptor {
-        private String credentials;
-
-        public BasicAuthInterceptor(String user, String password) {
-            credentials = Credentials.basic(user, password);
-        }
-
-        @Override
-        public Response intercept(Chain chain) throws IOException {
-            Request request = chain.request();
-            Request authenticatedRequest = request.newBuilder()
-                    .addHeader("Authorization", credentials)
-                    .build();
-            return chain.proceed(authenticatedRequest);
-        }
-
-    }
-    public static String doGet(String url) throws Exception {
-
-        SSLConnection.allowAllSSL();
-
-        URL obj = new URL(url);
-        HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-
-        connection.setRequestMethod("GET");
-
-        BufferedReader bufferedReader = new BufferedReader(
-                new InputStreamReader(connection.getInputStream()));
-        String inputline;
-        StringBuffer responce = new StringBuffer();
-
-        while ((inputline = bufferedReader.readLine()) != null) {
-            responce.append(inputline);
-        }
-        bufferedReader.close();
-
-        Log.d("myLogs","Response string: " + responce.toString());
-
-        return responce.toString();
-    }
 }
