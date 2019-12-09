@@ -84,4 +84,14 @@
         app:layout_constraintBaseline_toBaselineOf="@+id/btnSoap"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClick3"
+        android:text="HTTP"
+        app:layout_constraintEnd_toStartOf="@+id/button2"
+        app:layout_constraintStart_toEndOf="@+id/button"
+        app:layout_constraintTop_toBottomOf="@+id/btnSoap" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
