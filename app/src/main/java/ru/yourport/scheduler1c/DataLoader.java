@@ -95,7 +95,6 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
             try {
                 androidHttpTransport.call(SOAP_ACTION, envelope);
                 //SoapObject resultsRequestSoap = (SoapObject) envelope.bodyIn;
-                //System.out.println("Response::" + resultsRequestSoap.toString());
                 //resultString = "Response::" + resultsRequestSoap.toString();
                 String result = envelope.getResponse().toString();
                 Log.d(LOG_TAG, "Result: " + result);
@@ -103,9 +102,9 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
                 JSONObject jsonObject = new JSONObject(result);
                 JSONArray ja = jsonObject.getJSONArray("МассивОрганизаций");
 
-                resultString = new String[ja.length()+1][3];
+                resultString = new String[ja.length()][3];
 
-                resultString[0][1] = jsonObject.getString("Текст");
+                //resultString[0][1] = jsonObject.getString("Текст");
                 for (int i = 0; i < ja.length(); i++) {
                     JSONObject joOrg = ja.getJSONObject(i);
                     String id = joOrg.getString("ID");
@@ -114,8 +113,8 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
                     Log.d(LOG_TAG, "ID = " + id + ", Наименование = " + name +
                             ", IDFb = " + idfb);
 
-                    resultString[i+1][0] = id;
-                    resultString[i+1][1] = name;
+                    resultString[i][0] = id;
+                    resultString[i][1] = name;
                 }
 
             } catch (Exception e) {
@@ -140,7 +139,6 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
             Log.d(LOG_TAG, ERROR);
         }
 
-        //System.out.println(resultString);
         Date date = new Date();
         TimeEnd = date.getTime() - TimeStart;
 

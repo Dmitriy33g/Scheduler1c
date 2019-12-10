@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 Intent intent = new Intent(getApplicationContext(), ListActivity.class);
                 intent.putExtra("tvNameText", "Список организаций");
                 intent.putExtra("Title", "Выберите организацию");
+                intent.putExtra("query", "SOAP");
                 startActivity(intent);
             }
         });
@@ -107,30 +108,17 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         fireMissiles.show(getSupportFragmentManager(), "fireMissiles");
     }
 
-    public void onClick3(View view) {
+    public void onClickHTTP(View view) {
         Log.d("myLogs","OK");
 
-        new AsyncTask<Void, String, String>() {
-        @Override
-        protected String doInBackground(Void... voids) {
-            String s = "";
-            try {
-                Authenticate();
-                run();
-            } catch (Exception e) {
-                Log.d("myLogs","Error: " + e.getMessage());
-                e.printStackTrace();
-            }
-                return s;
-            }
+        Intent intent = new Intent(getApplicationContext(), ListActivity.class);
+        intent.putExtra("tvNameText", "Список организаций");
+        intent.putExtra("Title", "Выберите организацию");
+        intent.putExtra("query", "HTTP");
+        startActivity(intent);
 
-        @Override
-        protected void onPostExecute(final String result) {
-
-        }
-
-        }.execute();
-
+        //HttpClient httpClient = new HttpClient();
+        //httpClient.execute();
     }
 
     @Override
@@ -158,88 +146,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     });
             // Create the AlertDialog object and return it
             return builder.create();
-        }
-    }
-
-    public SSLSocketFactory sslSocket() {
-        X509TrustManager trustManager;
-        TrustManager[] trustManagers;
-        SSLSocketFactory sslSocketFactory;
-        try {
-            trustManagers = new TrustManager[]{new SSLConnection._FakeX509TrustManager()};
-            trustManager = (X509TrustManager) trustManagers[0];
-
-            //if (trustManagers == null) {
-            //    trustManagers = new TrustManager[]{new SSLConnection._FakeX509TrustManager()};
-            //}
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new TrustManager[] { trustManager }, new SecureRandom());
-            sslSocketFactory = sslContext.getSocketFactory();
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        }
-
-        //client = new OkHttpClient.Builder()
-        //        .sslSocketFactory(sslSocketFactory)
-        //        .build();
-        return sslSocketFactory;
-    }
-
-    public void Authenticate() {
-        client = new OkHttpClient.Builder()
-                .readTimeout(300, TimeUnit.SECONDS)
-                .hostnameVerifier(new HostnameVerifier() {
-                    @Override
-                    public boolean verify(String hostname, SSLSession session) {
-                        return true;
-                    }
-                })
-                .sslSocketFactory(sslSocket())
-                .authenticator(new Authenticator() {
-                    @Override
-                    public Request authenticate(Route route, Response response) throws IOException {
-                        if (response.request().header("Authorization") != null) {
-                            return null; // Give up, we've already attempted to authenticate.
-                        }
-
-                        //System.out.println("Authenticating for response: " + response);
-                        //System.out.println("Challenges: " + response.challenges());
-                        //String credential = Credentials.basic("jesse", "password1");
-                        String credential = Credentials.basic("wsChangeServis", "Service2018");
-                        return response.request().newBuilder()
-                                .header("Authorization", credential)
-                                .build();
-                    }
-                })
-                .build();
-    }
-
-    public void run() throws Exception {
-        RequestBody formBody = new FormBody.Builder()
-                .add("query", "ListOrganization")
-                .add("g", "test")
-                .build();
-
-        Request request = new Request.Builder()
-                .url("https://kamaz.ddns.net:10100/testut/hs/ExchangeTFK/query")
-                //.addHeader("gg", "test2")
-                .post(formBody)
-                .build();
-
-        try {
-            Response response = client.newCall(request).execute();
-            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
-            Headers responseHeaders = response.headers();
-            for (int i = 0; i < responseHeaders.size(); i++) {
-                //System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
-                Log.d("myLogs",responseHeaders.name(i) + ": " + responseHeaders.value(i));
-            }
-            Log.d("myLogs","Result: " + response.body().string());
-            //System.out.println(response.body().string());
-        } catch (IOException e) {
-            Log.d("myLogs","Error: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 

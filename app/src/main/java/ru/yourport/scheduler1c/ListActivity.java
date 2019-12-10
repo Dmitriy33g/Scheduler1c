@@ -43,6 +43,8 @@ public class ListActivity extends AppCompatActivity {
     ListView lvMain;
     SimpleAdapter adapter;
     DataLoader dl;
+    HttpClient hc;
+    String query = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +57,13 @@ public class ListActivity extends AppCompatActivity {
         String action = intent.getAction();
         String tvNameText = "";
 
+
         // в зависимости от action заполняем переменные
         //if (action.equals("ru.yourport.intent.action.showtime")) {
         if (action == null) {
             tvNameText = intent.getStringExtra("tvNameText");
             this.setTitle(intent.getStringExtra("Title"));
+            query = intent.getStringExtra("query");
         }
 
         tvName = findViewById(R.id.tvName);
@@ -85,26 +89,33 @@ public class ListActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        dl = new DataLoader();
-        dl.execute();
+        if (query.indexOf("SOAP") == 0) {
+            dl = new DataLoader();
+            dl.execute();
+        } else if (query.indexOf("HTTP") == 0) {
+            hc = new HttpClient();
+            hc.execute();
+        } else return;
+
         //dl.execute(etLogin.getText().toString(), etPassword.getText().toString());
 
         showResult();
     }
 
     private void showResult() {
-        if (dl == null) return;
+        if (dl == null && hc == null) return;
 
         String[][] result;
-        String ERROR = "";
+        String ERROR;
 
         TextView tvError = findViewById(R.id.tvError);
 
         try {
             Log.d(LOG_TAG, "Try to get result");
-            result = dl.get();
+            result = dl == null ? hc.get() : dl.get();
             Log.d(LOG_TAG, "get returns " + result.length);
-            Toast.makeText(this, "Время выполнения " + dl.getTimeEnd(), Toast.LENGTH_LONG).show();
+            long timeEnd = dl == null ? hc.getTimeEnd() : dl.getTimeEnd();
+            Toast.makeText(this, "Время выполнения " + timeEnd, Toast.LENGTH_LONG).show();
         } catch (InterruptedException e) {
             ERROR = "InterruptedException: " + e.getMessage();
             tvError.setText(ERROR);
@@ -117,10 +128,10 @@ public class ListActivity extends AppCompatActivity {
             return;
         }
 
-        ERROR = dl.getERROR();
-        if (ERROR != "") {
+        ERROR = dl == null ? hc.getERROR() : dl.getERROR();
+        if (!ERROR.isEmpty()) {
             tvError.setText(ERROR);
-            Toast.makeText(this, "Ошибка DataLoader: " + ERROR, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Ошибка: " + ERROR, Toast.LENGTH_LONG).show();
             return;
         }
 
