@@ -3,9 +3,6 @@ package ru.yourport.scheduler1c;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
@@ -57,30 +54,21 @@ public class HttpClient extends AsyncTask<String, Integer, String[][]> {
     @Override
     protected String[][] doInBackground(String... strings) {
         String[][] resultString = new String[0][0];
-        String LOGIN = "wsChangeServis";//strings[0]
-        String PASSWORD = "Service2018";//strings[1]
+        String LOGIN = "wsChangeServis";
+        String PASSWORD = "Service2018";
+        String query = strings[0];
 
         try {
             Authenticate(LOGIN, PASSWORD);
-
-            JSONObject jsonObject = new JSONObject(run());
-            JSONArray ja = jsonObject.getJSONArray("МассивОрганизаций");
-
-            resultString = new String[ja.length()][3];
-
-            //resultString[0][1] = jsonObject.getString("Текст");
-            for (int i = 0; i < ja.length(); i++) {
-                JSONObject joOrg = ja.getJSONObject(i);
-                String id = joOrg.getString("ID");
-                String name = joOrg.getString("Наименование");
-                int idfb = joOrg.getInt("IDFb");
-                Log.d(LOG_TAG, "ID = " + id + ", Наименование = " + name +
-                        ", IDFb = " + idfb);
-
-                resultString[i][0] = id;
-                resultString[i][1] = name;
+            String result = run(query);
+            try {
+                JsonParser jsonParser = new JsonParser();
+                resultString = jsonParser.Parser(result);
+            } catch (Exception e) {
+                ERROR = e.getMessage();
+                Log.d(LOG_TAG, "JSONObject error: " + ERROR);
+                e.printStackTrace();
             }
-
         } catch (Exception e) {
             Log.d(LOG_TAG,"Error HttpClient: " + e.getMessage());
             e.printStackTrace();
@@ -143,10 +131,10 @@ public class HttpClient extends AsyncTask<String, Integer, String[][]> {
                 .build();
     }
 
-    private String run() {
+    private String run(String query) {
 
         RequestBody formBody = new FormBody.Builder()
-                .add("List", "Organization")
+                .add("List", query)
                 .add("g", "test")
                 .build();
 

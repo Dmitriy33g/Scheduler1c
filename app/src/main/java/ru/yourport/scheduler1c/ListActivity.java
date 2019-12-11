@@ -44,7 +44,9 @@ public class ListActivity extends AppCompatActivity {
     SimpleAdapter adapter;
     DataLoader dl;
     HttpClient hc;
+    String transport = "";
     String query = "";
+    String tvNameText = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,14 +57,13 @@ public class ListActivity extends AppCompatActivity {
         Intent intent = getIntent();
         // читаем из него action
         String action = intent.getAction();
-        String tvNameText = "";
-
 
         // в зависимости от action заполняем переменные
         //if (action.equals("ru.yourport.intent.action.showtime")) {
         if (action == null) {
-            tvNameText = intent.getStringExtra("tvNameText");
             this.setTitle(intent.getStringExtra("Title"));
+            tvNameText = intent.getStringExtra("tvNameText");
+            transport = intent.getStringExtra("transport");
             query = intent.getStringExtra("query");
         }
 
@@ -89,12 +90,12 @@ public class ListActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (query.indexOf("SOAP") == 0) {
+        if (transport.indexOf("SOAP") == 0) {
             dl = new DataLoader();
-            dl.execute();
-        } else if (query.indexOf("HTTP") == 0) {
+            dl.execute(query);//СписокОрганизаций
+        } else if (transport.indexOf("HTTP") == 0) {
             hc = new HttpClient();
-            hc.execute();
+            hc.execute(query);//Organization
         } else return;
 
         //dl.execute(etLogin.getText().toString(), etPassword.getText().toString());
@@ -144,9 +145,13 @@ public class ListActivity extends AppCompatActivity {
         //adapter = new ArrayAdapter<>(adapter.getContext(),
         //        android.R.layout.simple_list_item_1, s); //или через ArrayList ss
 
-        ArrayList<Map<String, Object>> data = new ArrayList<>(result.length);
+        int lengthResult = result.length;
+        String newTvNameText = tvNameText.concat(" = " + lengthResult);
+        tvName.setText(newTvNameText);
+
+        ArrayList<Map<String, Object>> data = new ArrayList<>(lengthResult);
         Map<String, Object> m;
-        for (int i = 0; i < result.length; i++) {
+        for (int i = 0; i < lengthResult; i++) {
             m = new HashMap<String, Object>();
             m.put(ATTRIBUTE_NAME_ID, result[i][0]);
             m.put(ATTRIBUTE_NAME_TIME, result[i][1]);

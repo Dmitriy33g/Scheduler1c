@@ -41,7 +41,6 @@
             android:layout_gravity="center"
             android:layout_marginLeft="10dp"
             android:text="TextView"
-            android:textColor="@android:color/secondary_text_dark"
             android:textStyle="normal" />
 
     </LinearLayout>

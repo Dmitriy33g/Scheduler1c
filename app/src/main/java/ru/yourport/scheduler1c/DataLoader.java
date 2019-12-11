@@ -3,8 +3,6 @@ package ru.yourport.scheduler1c;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -47,8 +45,9 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
     protected String[][] doInBackground(String... strings) {
 
         String[][] resultString = new String[0][0];
-        String LOGIN = "wsChangeServis";//arg[0]
-        String PASSWORD = "Service2018";//arg[1]
+        String LOGIN = "wsChangeServis";
+        String PASSWORD = "Service2018";
+        String query = strings[0];
         //String SOAP_ACTION = "http://web/tfk/ExchangeTFK#ExchangeTFK:Operation";
         //String METHOD_NAME = "Операция";//Выполнить Operation SayHello
         //Log.d(LOG_TAG, "Login: " + LOGIN);
@@ -56,7 +55,7 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
 
         try {
             SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
-            request.addProperty("Запрос", "СписокОрганизаций");
+            request.addProperty("Запрос", query);//"СписокОрганизаций"
             //request.addProperty("id", sale.getId());
             //SimpleDateFormat dateFormat = new SimpleDateFormat(
             //        "yyyy-MM-dd'T'HH:mm:ss");
@@ -76,10 +75,6 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
             //}
             //request.addSoapObject(sales);
 
-            //SoapObject query = new SoapObject(NAMESPACE, "ПолучитьСписокОбъектовЗапроса");
-            //query.addProperty("Тип", "ЭлектроннаяОчередь");
-            //request.addSoapObject(query);
-
             SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
                     SoapEnvelope.VER12);
             // Тоже важный элемент - не выводит типы данных в элементах xml
@@ -91,41 +86,23 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
             HttpTransportBasicAuthSE androidHttpTransport = new HttpTransportBasicAuthSE(
                     URL, LOGIN, PASSWORD);
             androidHttpTransport.debug = true;
+            androidHttpTransport.call(SOAP_ACTION, envelope);
+            //SoapObject resultsRequestSoap = (SoapObject) envelope.bodyIn;
+            //resultString = "Response::" + resultsRequestSoap.toString();
+            String result = envelope.getResponse().toString();
+            Log.d(LOG_TAG, "Result: " + result);
 
             try {
-                androidHttpTransport.call(SOAP_ACTION, envelope);
-                //SoapObject resultsRequestSoap = (SoapObject) envelope.bodyIn;
-                //resultString = "Response::" + resultsRequestSoap.toString();
-                String result = envelope.getResponse().toString();
-                Log.d(LOG_TAG, "Result: " + result);
-
-                JSONObject jsonObject = new JSONObject(result);
-                JSONArray ja = jsonObject.getJSONArray("МассивОрганизаций");
-
-                resultString = new String[ja.length()][3];
-
-                //resultString[0][1] = jsonObject.getString("Текст");
-                for (int i = 0; i < ja.length(); i++) {
-                    JSONObject joOrg = ja.getJSONObject(i);
-                    String id = joOrg.getString("ID");
-                    String name = joOrg.getString("Наименование");
-                    int idfb = joOrg.getInt("IDFb");
-                    Log.d(LOG_TAG, "ID = " + id + ", Наименование = " + name +
-                            ", IDFb = " + idfb);
-
-                    resultString[i][0] = id;
-                    resultString[i][1] = name;
-                }
-
+                JsonParser jsonParser = new JsonParser();
+                resultString = jsonParser.Parser(result);
             } catch (Exception e) {
-                Log.d(LOG_TAG, e.getClass() + " HTTP TRANSPORT error: " + e.getMessage());
                 ERROR = e.getMessage();
-
+                Log.d(LOG_TAG, e.getClass() + " JSONObject error: " + ERROR);
                 e.printStackTrace();
             }
         } catch (Exception e) {
-            Log.d(LOG_TAG, e.getClass() + " error: " + e.getMessage());
             ERROR = e.getMessage();
+            Log.d(LOG_TAG, e.getClass() + " error: " + ERROR);
             e.printStackTrace();
         }
 

@@ -1,64 +1,34 @@
 package ru.yourport.scheduler1c;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import okhttp3.Authenticator;
-import okhttp3.Credentials;
-import okhttp3.FormBody;
-import okhttp3.Headers;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.Route;
-//import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     final String LOG_TAG = "myLogs";
     EditText etLogin, etPassword;
+    Spinner spinner;
 
-    OkHttpClient client = new OkHttpClient();
+    String[] dataSpinner = {"Список организаций", "Список остатков номенклатуры"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,22 +38,33 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         etLogin = findViewById(R.id.etLogin);
         etPassword = findViewById(R.id.etPassword);
 
-        Button btnSoap = findViewById(R.id.btnSoap);
-        btnSoap.setOnClickListener(new View.OnClickListener() {
+        // адаптер
+        ArrayAdapter<String> adapterSpinner = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, dataSpinner);
+        adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner = findViewById(R.id.spinner);
+        spinner.setAdapter(adapterSpinner);
+        // заголовок
+        spinner.setPrompt("Title");
+        // выделяем элемент
+        spinner.setSelection(1);
+        // устанавливаем обработчик нажатия
+        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), ListActivity.class);
-                intent.putExtra("tvNameText", "Список организаций");
-                intent.putExtra("Title", "Выберите организацию");
-                intent.putExtra("query", "SOAP");
-                startActivity(intent);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // показываем позиция нажатого элемента
+                //Toast.makeText(getBaseContext(), "Position = " + position, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 
     }
 
     public void clickTest(View view) {
-
 
         Toast toast = Toast.makeText(this, "Тест", Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
@@ -108,17 +89,40 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         fireMissiles.show(getSupportFragmentManager(), "fireMissiles");
     }
 
-    public void onClickHTTP(View view) {
-        Log.d("myLogs","OK");
+    public void onClickSoapHttp(View view) {
+        String nameText = "";
+        String title = "";
+        String transport = "";
+        String query = "";
+
+        switch (view.getId()) {
+            case R.id.btnSoap:
+                transport = "SOAP";
+                break;
+            case R.id.btnHttp:
+                transport = "HTTP";
+                break;
+        }
+
+        switch (spinner.getSelectedItemPosition()) {
+            case 0:
+                nameText = "Список организаций";
+                title = "Выберите организацию";
+                query = "Organization";
+                break;
+            case 1:
+                nameText = "Список остатков номенклатуры";
+                title = "Выберите номенклатуру";
+                query = "OstatkiNomenklatury";
+                break;
+        }
 
         Intent intent = new Intent(getApplicationContext(), ListActivity.class);
-        intent.putExtra("tvNameText", "Список организаций");
-        intent.putExtra("Title", "Выберите организацию");
-        intent.putExtra("query", "HTTP");
+        intent.putExtra("tvNameText", nameText);
+        intent.putExtra("Title", title);
+        intent.putExtra("transport", transport);
+        intent.putExtra("query", query);
         startActivity(intent);
-
-        //HttpClient httpClient = new HttpClient();
-        //httpClient.execute();
     }
 
     @Override
