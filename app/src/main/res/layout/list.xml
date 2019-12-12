@@ -20,6 +20,13 @@
         android:text="@string/list_name"
         android:textSize="18sp" />
 
+    <ProgressBar
+        android:id="@+id/pbHor"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true" />
+
     <ListView
         android:id="@+id/lvMain"
         android:layout_width="match_parent"

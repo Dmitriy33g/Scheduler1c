@@ -61,6 +61,7 @@ public class HttpClient extends AsyncTask<String, Integer, String[][]> {
         try {
             Authenticate(LOGIN, PASSWORD);
             String result = run(query);
+            if (!ERROR.isEmpty()) return resultString;
             try {
                 JsonParser jsonParser = new JsonParser();
                 resultString = jsonParser.Parser(result);

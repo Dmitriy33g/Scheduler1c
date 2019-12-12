@@ -2,15 +2,19 @@ package ru.yourport.scheduler1c;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 public class ListActivity extends AppCompatActivity {
 
@@ -47,6 +50,7 @@ public class ListActivity extends AppCompatActivity {
     String transport = "";
     String query = "";
     String tvNameText = "";
+    ProgressBar pbHor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +73,7 @@ public class ListActivity extends AppCompatActivity {
 
         tvName = findViewById(R.id.tvName);
         tvName.setText(tvNameText);
+        pbHor = findViewById(R.id.pbHor);
 
         lvMain = findViewById(R.id.lvMain);
 
@@ -84,34 +89,113 @@ public class ListActivity extends AppCompatActivity {
                 Toast.makeText(view.getContext(), info, Toast.LENGTH_LONG).show();
             }
         });
+
+        //String[][] result;
+
+        /*handler = new Handler() {
+            public void handleMessage(Message msg) {
+                if (msg.what == 1) pbHor.setVisibility(View.GONE);
+            }
+        };
+
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                if (transport.indexOf("SOAP") == 0) {
+                    dl = new DataLoader();
+                    dl.execute(query);//СписокОрганизаций
+                } else if (transport.indexOf("HTTP") == 0) {
+                    hc = new HttpClient();
+                    hc.execute(query);//Organization
+                } else return;
+
+                //dl.execute(etLogin.getText().toString(), etPassword.getText().toString());
+
+                //showResult();
+                handler.sendEmptyMessage(1);
+                //result = new String[0][0];
+            }
+        });
+        thread.start();
+        */
+        new Thread(myThread).start();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        if (transport.indexOf("SOAP") == 0) {
-            dl = new DataLoader();
-            dl.execute(query);//СписокОрганизаций
-        } else if (transport.indexOf("HTTP") == 0) {
-            hc = new HttpClient();
-            hc.execute(query);//Organization
-        } else return;
-
-        //dl.execute(etLogin.getText().toString(), etPassword.getText().toString());
-
-        showResult();
     }
 
-    private void showResult() {
-        if (dl == null && hc == null) return;
+    private Runnable myThread = new Runnable() {
 
         String[][] result;
+        long timeEnd;
         String ERROR;
+
+        @Override
+        public void run() {
+            if (transport.indexOf("SOAP") == 0) {
+                dl = new DataLoader();
+                dl.execute(query);
+                //dl.execute(etLogin.getText().toString(), etPassword.getText().toString());
+            } else if (transport.indexOf("HTTP") == 0) {
+                hc = new HttpClient();
+                hc.execute(query);
+            } else {
+                ERROR = "Неопределен transport";
+                handler.sendEmptyMessage(1);
+                return;
+            }
+
+            if (dl == null && hc == null) {
+                ERROR = "null class transport";
+                handler.sendEmptyMessage(1);
+                return;
+            }
+
+            try {
+                Log.d(LOG_TAG, "Try to get result");
+                result = dl == null ? hc.get() : dl.get();
+                Log.d(LOG_TAG, "get returns " + result.length);
+                timeEnd = dl == null ? hc.getTimeEnd() : dl.getTimeEnd();
+            } catch (Exception e) {
+                ERROR = "Exception error: " + e.getMessage();
+                e.printStackTrace();
+                handler.sendEmptyMessage(1);
+                return;
+            }
+
+            ERROR = dl == null ? hc.getERROR() : dl.getERROR();
+
+            //showResult();
+            handler.sendEmptyMessage(1);
+        }
+
+        @SuppressLint("HandlerLeak")
+        Handler handler = new Handler() {
+            public void handleMessage(Message msg) {
+                Log.d(LOG_TAG, "handleMessage = " + msg);
+                if (msg.what == 1) {
+                    showResult(result, ERROR);
+                    pbHor.setVisibility(View.GONE);
+                    Toast.makeText(getApplicationContext(),
+                            "Время выполнения " + timeEnd, Toast.LENGTH_LONG).show();
+                    //handler.removeCallbacks(myThread);
+                }
+            }
+         };
+    };
+
+    private void showResult(String[][] result, String ERROR) {
+        //if (dl == null && hc == null) return;
+
+        //String[][] result;
+        //String ERROR;
 
         TextView tvError = findViewById(R.id.tvError);
 
-        try {
+        /*try {
             Log.d(LOG_TAG, "Try to get result");
             result = dl == null ? hc.get() : dl.get();
             Log.d(LOG_TAG, "get returns " + result.length);
@@ -130,6 +214,7 @@ public class ListActivity extends AppCompatActivity {
         }
 
         ERROR = dl == null ? hc.getERROR() : dl.getERROR();
+        */
         if (!ERROR.isEmpty()) {
             tvError.setText(ERROR);
             Toast.makeText(this, "Ошибка: " + ERROR, Toast.LENGTH_LONG).show();
@@ -162,11 +247,11 @@ public class ListActivity extends AppCompatActivity {
 
         adapter = new MySimpleAdapter(this, data, R.layout.item, from, to);
         lvMain.setAdapter(adapter);
-   }
+    }
 
     class MySimpleAdapter extends SimpleAdapter {
 
-        public MySimpleAdapter(Context context,
+        private MySimpleAdapter(Context context,
                                List<? extends Map<String, ?>> data, int resource,
                                String[] from, int[] to) {
             super(context, data, resource, from, to);
