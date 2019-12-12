@@ -1,5 +1,6 @@
 package ru.yourport.scheduler1c;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -57,6 +58,8 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
 
+        Log.d(LOG_TAG, "savedInstanceState=" + savedInstanceState);
+        //Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
         // получаем Intent, который вызывал это Activity
         Intent intent = getIntent();
         // читаем из него action
@@ -90,41 +93,32 @@ public class ListActivity extends AppCompatActivity {
             }
         });
 
-        //String[][] result;
+        //if (savedInstanceState != null) return;
 
-        /*handler = new Handler() {
-            public void handleMessage(Message msg) {
-                if (msg.what == 1) pbHor.setVisibility(View.GONE);
-            }
-        };
-
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                if (transport.indexOf("SOAP") == 0) {
-                    dl = new DataLoader();
-                    dl.execute(query);//СписокОрганизаций
-                } else if (transport.indexOf("HTTP") == 0) {
-                    hc = new HttpClient();
-                    hc.execute(query);//Organization
-                } else return;
-
-                //dl.execute(etLogin.getText().toString(), etPassword.getText().toString());
-
-                //showResult();
-                handler.sendEmptyMessage(1);
-                //result = new String[0][0];
-            }
-        });
-        thread.start();
-        */
         new Thread(myThread).start();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //handler.removeCallbacks(myThread);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.putStringArrayList("dataArrayList", dataArrayList);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        //dataArrayList = savedInstanceState.getStringArrayList("dataArrayList");
     }
 
     private Runnable myThread = new Runnable() {
@@ -237,7 +231,7 @@ public class ListActivity extends AppCompatActivity {
         ArrayList<Map<String, Object>> data = new ArrayList<>(lengthResult);
         Map<String, Object> m;
         for (int i = 0; i < lengthResult; i++) {
-            m = new HashMap<String, Object>();
+            m = new HashMap<>();
             m.put(ATTRIBUTE_NAME_ID, result[i][0]);
             m.put(ATTRIBUTE_NAME_TIME, result[i][1]);
             m.put(ATTRIBUTE_NAME_CHASSIS, "");
