@@ -66,14 +66,17 @@ public class HttpClient extends AsyncTask<String, Integer, String[][]> {
                 JsonParser jsonParser = new JsonParser();
                 resultString = jsonParser.Parser(result);
             } catch (Exception e) {
+                e.printStackTrace();
                 ERROR = e.getMessage();
                 Log.d(LOG_TAG, "JSONObject error: " + ERROR);
-                e.printStackTrace();
             }
         } catch (Exception e) {
-            Log.d(LOG_TAG,"Error HttpClient: " + e.getMessage());
             e.printStackTrace();
+            ERROR = e.getMessage();
+            Log.d(LOG_TAG,"Error HttpClient: " + ERROR);
         }
+
+        redefintionError();
 
         Date date = new Date();
         TimeEnd = date.getTime() - TimeStart;
@@ -162,6 +165,26 @@ public class HttpClient extends AsyncTask<String, Integer, String[][]> {
             e.printStackTrace();
         }
 
+        redefintionError();
+
         return "";
+    }
+
+    private void redefintionError() {
+
+        int index401 = ERROR.indexOf("code=401");
+        int index404 = ERROR.indexOf("code=404");
+        int index405 = ERROR.indexOf("code=405");
+        int indexHost = ERROR.indexOf("No address associated with hostname");
+        int indexPort = ERROR.indexOf("unexpected url");
+        if (index401 > -1) {
+            ERROR = "Не пройдена авторизация";
+        } else if (indexHost > -1) {
+            ERROR = "Не определен хост";
+        } else if (indexPort > -1) {
+            ERROR = "Не определен порт хоста";
+        } else if (index404 > -1 || index405 > -1) {
+            ERROR = "Не верный запрос";
+        }
     }
 }

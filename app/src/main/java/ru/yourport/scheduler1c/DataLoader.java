@@ -107,13 +107,18 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
         }
 
         int index401 = ERROR.indexOf("HTTP status: 401");
+        int index404 = ERROR.indexOf("HTTP status: 404");
+        int index405 = ERROR.indexOf("HTTP status: 405");
         int indexHost = ERROR.indexOf("Unable to resolve host");
+        int indexPort = ERROR.indexOf("port=");
         if (index401 > -1) {
             ERROR = "Не пройдена авторизация";
-            Log.d(LOG_TAG, ERROR);
         } else if (indexHost > -1) {
-            ERROR = "Не найден хост";
-            Log.d(LOG_TAG, ERROR);
+            ERROR = "Не определен хост";
+        } else if (indexPort > -1) {
+            ERROR = "Не определен порт хоста";
+        } else if (index404 > -1 || index405 > -1) {
+            ERROR = "Не верный запрос";
         }
 
         Date date = new Date();

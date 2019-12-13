@@ -13,8 +13,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ListActivity"
-            android:label="@string/list_name">
-
+            android:label="@string/list_name"
+            android:configChanges="orientation|screenSize">
         </activity>
         <activity android:name=".MainActivity">
             <intent-filter>

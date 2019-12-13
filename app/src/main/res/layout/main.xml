@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:text="Логин"
+        android:text="@string/email"
         android:textSize="24sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/etLogin"
         app:layout_constraintStart_toStartOf="parent" />
@@ -25,7 +25,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:background="@android:drawable/editbox_background_normal"
-        android:inputType="textPersonName"
+        android:hint="@string/hint_mail"
+        android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/etPassword"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:text="Пароль"
+        android:text="@string/password"
         android:textSize="24sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/etPassword"
         app:layout_constraintStart_toStartOf="parent" />
@@ -54,7 +55,8 @@
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tvPassword"
-        app:layout_constraintTop_toBottomOf="@+id/etLogin" />
+        app:layout_constraintTop_toBottomOf="@+id/etLogin"
+        android:importantForAutofill="no" />
 
     <Button
         android:id="@+id/btnSoap"

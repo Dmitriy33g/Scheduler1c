@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Scheduler1c</string>
     <string name="list_name">Список</string>
+    <string name="email">Почта</string>
+    <string name="password">Пароль</string>
+    <string name="hint_mail">name@email.com</string>
 </resources>
