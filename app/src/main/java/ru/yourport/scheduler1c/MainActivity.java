@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -27,10 +26,17 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener,
+        DialogInterface.OnClickListener {
 
     private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
 
     final String LOG_TAG = "myLogs";
     EditText etLogin, etPassword;
@@ -45,12 +51,26 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Boolean bol = dataSnapshot.hasChild("1c");
+                String value = dataSnapshot.child("master1c").child("log").getValue(String.class);
+                Log.d(LOG_TAG, value + "\n1c=" + bol);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(LOG_TAG, "Failed to read value.", databaseError.toException());
+            }
+        });
 
         etLogin = findViewById(R.id.etLogin);
         etPassword = findViewById(R.id.etPassword);
 
         // адаптер
-        ArrayAdapter<String> adapterSpinner = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> adapterSpinner = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, dataSpinner);
         adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -96,8 +116,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     public void onClick2(View view) {
 
-        DialogFragment fireMissiles = new FireMissilesDialogFragment();
-        fireMissiles.show(getSupportFragmentManager(), "fireMissiles");
+        DialogFragment dialog = new MessageFragment();
+        Bundle args = new Bundle();
+        args.putString("message", "Привет!");
+        args.putBoolean("isPositive", true);
+        dialog.setArguments(args);
+        dialog.show(getSupportFragmentManager(), "dialog");
+        //dialog.dismissDialog(dialog, 8000);
     }
 
     public void onClickSoapHttp(View view) {
@@ -143,24 +168,20 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 "Today is " + day + "." + (month + 1) + "." + year, Toast.LENGTH_LONG).show();
     }
 
-    public static class FireMissilesDialogFragment extends DialogFragment {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage("Вопрос?")//R.string.dialog_fire_missiles
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // FIRE ZE MISSILES!
-                         }
-                    })
-                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User cancelled the dialog
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+
+        switch (which) {
+            case Dialog.BUTTON_POSITIVE:
+                //i = R.string.yes;
+                Log.d(LOG_TAG, "Dialog BUTTON_POSITIVE");
+                break;
+            case Dialog.BUTTON_NEGATIVE:
+                Log.d(LOG_TAG, "Dialog BUTTON_NEGATIVE");
+                break;
+            case Dialog.BUTTON_NEUTRAL:
+                Log.d(LOG_TAG, "Dialog BUTTON_NEUTRAL");
+                break;
         }
     }
 
