@@ -24,8 +24,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Boolean bol = dataSnapshot.hasChild("1c");
                 String value = dataSnapshot.child("master1c").child("log").getValue(String.class);
-                Log.d(LOG_TAG, value + "\n1c=" + bol);
+                Log.d(LOG_TAG, value + "=1c=" + bol);
             }
 
             @Override
@@ -66,8 +69,26 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         });
 
+        mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                if (firebaseUser != null ) {
+
+                    Log.d("myLogs", firebaseUser.isEmailVerified() ?
+                            "Пользователь вошел в систему как " + firebaseUser.getEmail() +
+                            ", и адрес электронной почты подтвержден" :
+                            "Адрес электронной почты не подтвержден");
+                } else {
+                    Log.d("myLogs", "onAuthStateChanged:signed_out");
+                }
+            }
+        });
+
         etLogin = findViewById(R.id.etLogin);
         etPassword = findViewById(R.id.etPassword);
+
+        //reauthenticate(etLogin.getText().toString(), etPassword.getText().toString());
 
         // адаптер
         ArrayAdapter<String> adapterSpinner = new ArrayAdapter<>(this,
@@ -121,8 +142,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         args.putString("message", "Привет!");
         args.putBoolean("isPositive", true);
         dialog.setArguments(args);
+        dialog.setCancelable(false);
         dialog.show(getSupportFragmentManager(), "dialog");
-        //dialog.dismissDialog(dialog, 8000);
+        ((MessageFragment) dialog).dismissDialog((MessageFragment) dialog, 8000);
     }
 
     public void onClickSoapHttp(View view) {
@@ -161,6 +183,33 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         startActivity(intent);
     }
 
+    public void onClickAvto(View view) {
+
+        final String login = etLogin.getText().toString();
+        final String password = etPassword.getText().toString();
+
+        int index = login.indexOf("@");
+        String logstart = login.substring(0, index > 0 ? index-1 : 0);
+        String logfinish = login.substring(index > 0 ? index+1 : 0);
+
+        if (login.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Введите Email и Пароль", Toast.LENGTH_LONG).show();
+            return;
+        } else if (index == -1 || logstart.isEmpty() || logfinish.isEmpty() ) {
+            Toast.makeText(this, "Не верно введен Email", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        switch (view.getId()) {
+            case R.id.btnSingIn:
+                signIn(login, password);
+                break;
+            case R.id.btnReg:
+                registration(login, password);
+                break;
+        }
+    }
+
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
 
@@ -173,7 +222,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         switch (which) {
             case Dialog.BUTTON_POSITIVE:
-                //i = R.string.yes;
                 Log.d(LOG_TAG, "Dialog BUTTON_POSITIVE");
                 break;
             case Dialog.BUTTON_NEGATIVE:
@@ -192,40 +240,104 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(LOG_TAG, "signInWithEmail:success");
-                            //FirebaseUser user = mAuth.getCurrentUser();
-                            //updateUI(user);
+                            Log.d(LOG_TAG, "Авторизация пройдена");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(MainActivity.this,
+                                    "Авторизация пройдена", Toast.LENGTH_SHORT).show();
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(LOG_TAG, "signInWithEmail:failure", task.getException());
+                            Log.d(LOG_TAG, "Авторизация не пройдена", task.getException());
                             Toast.makeText(MainActivity.this,
-                                    "Authentication failed.", Toast.LENGTH_SHORT).show();
-                            //updateUI(null);
+                                    "Авторизация не пройдена", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
 
-    public void registration (String email, String password) {
+    public void registration (final String email, final String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(LOG_TAG, "createUserWithEmail:success");
+                            Log.d(LOG_TAG, "Пользователь успешно зарегистрирован");
+                            //Toast.makeText(MainActivity.this,
+                            //        "Пользователь успешно зарегистрирован",
+                            //        Toast.LENGTH_SHORT).show();
                             //FirebaseUser user = mAuth.getCurrentUser();
                             //updateUI(user);
+                            sendVerificationEmail();
+                            User user = new User(mAuth.getUid(), "", "");//email
+                            mDatabase.child("users").child(mAuth.getUid()).setValue(user);
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(LOG_TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
+                            Log.w(LOG_TAG, "Не прошла регистрация", task.getException());
+                            Toast.makeText(MainActivity.this, "Регистрация не прошла",
                                     Toast.LENGTH_SHORT).show();
-                            //updateUI(null);
                         }
-
-                        // ...
                     }
                 });
+    }
+
+    public void sendVerificationEmail() {
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if (user != null) {
+            user.sendEmailVerification()
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(MainActivity.this,
+                                        "Регистрация прошла успешно. Письмо с подтверждением отправлено",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
+    }
+
+    public void reauthenticate(final String email, final String password) {
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if (user != null && (email.isEmpty() || password.isEmpty())) {
+            mAuth.signOut();
+            return;
+        } else if (email.isEmpty() || password.isEmpty()) return;
+
+        AuthCredential credential = EmailAuthProvider.getCredential(email, password);
+        user.reauthenticate(credential)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(MainActivity.this,
+                                    "Перерегистрация прошла успешно", Toast.LENGTH_SHORT).show();
+                            Log.d(LOG_TAG, "Перерегистрация прошла успешно", task.getException());
+                        } else {
+                            Log.d(LOG_TAG, "Перерегистрация не пройдена", task.getException());
+                        }
+
+                    }
+                });
+    }
+
+    public class User {
+
+        public String username;
+        public String email;
+        public String id;
+
+        public User() {
+            // Default constructor required for calls to DataSnapshot.getValue(User.class)
+        }
+
+        public User(String id, String username, String email) {
+            this.id = id;
+            this.username = username;
+            this.email = email;
+        }
+
     }
 }

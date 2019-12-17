@@ -4,4 +4,6 @@
     <string name="email">Почта</string>
     <string name="password">Пароль</string>
     <string name="hint_mail">name@email.com</string>
+    <string name="signin">Авторизация</string>
+    <string name="registration">Регистрация</string>
 </resources>

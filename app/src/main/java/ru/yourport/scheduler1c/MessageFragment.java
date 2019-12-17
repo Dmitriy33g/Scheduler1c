@@ -5,17 +5,14 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 import androidx.fragment.app.DialogFragment;
 
 public class MessageFragment extends DialogFragment implements DialogInterface.OnClickListener {
-    final String LOG_TAG = "myLogs";
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
-        //Log.d("myLogs", "savedInstanceState=" + savedInstanceState);
         Bundle args = this.getArguments();
         String message = args.getString("message");
         Boolean isPositive = args.getBoolean("isPositive");
@@ -40,27 +37,22 @@ public class MessageFragment extends DialogFragment implements DialogInterface.O
             builder.setNeutralButton(nameNeutral, (DialogInterface.OnClickListener) getActivity());
         }
         //if (!(isPositive || isNegative || isNeutral))
-            builder.setCancelable(false);
+
         // Create the AlertDialog object and return it
         return builder.create();
     }
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
-        int i = 0;
+
         switch (which) {
             case Dialog.BUTTON_POSITIVE:
-                //i = R.string.yes;
                 break;
             case Dialog.BUTTON_NEGATIVE:
-                //i = R.string.no;
                 break;
             case Dialog.BUTTON_NEUTRAL:
-                //i = R.string.maybe;
                 break;
         }
-        if (i > 0)
-            Log.d(LOG_TAG, "Dialog: " + getResources().getString(i));
     }
 
     public void dismissDialog(final MessageFragment dialog, int daleyTime) {
