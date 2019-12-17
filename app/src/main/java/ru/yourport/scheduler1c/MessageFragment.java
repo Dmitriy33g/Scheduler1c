@@ -5,41 +5,67 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
 public class MessageFragment extends DialogFragment implements DialogInterface.OnClickListener {
+
+    private final String LOG_TAG = "myLogs";
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         Bundle args = this.getArguments();
+        int layout = args.getInt("layout", 0);
+        String title = args.getString("title");
         String message = args.getString("message");
-        Boolean isPositive = args.getBoolean("isPositive");
-        Boolean isNegative = args.getBoolean("isNegative");
-        Boolean isNeutral = args.getBoolean("isNeutral");
+        String namePositive = args.getString("namePositive");
+        String nameNegative = args.getString("nameNegative");
+        String nameNeutral = args.getString("nameNeutral");
+        Boolean isPositive = namePositive != null;
+        Boolean isNegative = nameNegative != null;
+        Boolean isNeutral = nameNeutral != null;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(message);//R.string.dialog_fire_missiles
-        if (isPositive) {
-            String namePositive = args.getString("namePositive");
-            namePositive = namePositive == null ? "ОК": namePositive;
+
+        if (title != null) builder.setTitle(title);
+        if (message != null) builder.setMessage(message);//R.string.dialog_fire_missiles
+        if (layout != 0) {
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View view = inflater.inflate(layout, null);
+            //view.findViewById(R.id.btnYes).setOnClickListener((View.OnClickListener) getActivity());
+            builder.setView(view);
+        }
+
+        if (isPositive || !(isNegative && isNeutral)) {
             builder.setPositiveButton(namePositive, (DialogInterface.OnClickListener) getActivity());
         }
         if (isNegative) {
-            String nameNegative = args.getString("nameNegative");
-            nameNegative = nameNegative == null ? "Отмена": nameNegative;
             builder.setNegativeButton(nameNegative, (DialogInterface.OnClickListener) getActivity());
         }
         if (isNeutral) {
-            String nameNeutral = args.getString("nameNeutral");
-            nameNeutral = nameNeutral == null ? "Продолжить": nameNeutral;
             builder.setNeutralButton(nameNeutral, (DialogInterface.OnClickListener) getActivity());
         }
         //if (!(isPositive || isNegative || isNeutral))
 
         // Create the AlertDialog object and return it
         return builder.create();
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        Log.d(LOG_TAG, "DialogInterface:onDismiss");
+    }
+
+    @Override
+    public void onCancel(@NonNull DialogInterface dialog) {
+        super.onCancel(dialog);
+        Log.d(LOG_TAG, "DialogInterface:onCancel");
     }
 
     @Override

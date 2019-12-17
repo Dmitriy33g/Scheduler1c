@@ -3,6 +3,7 @@ package ru.yourport.scheduler1c;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -58,9 +59,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Boolean bol = dataSnapshot.hasChild("1c");
+                //Boolean bol = dataSnapshot.hasChild("1c");
                 String value = dataSnapshot.child("master1c").child("log").getValue(String.class);
-                Log.d(LOG_TAG, value + "=1c=" + bol);
+                Log.d(LOG_TAG, value);
             }
 
             @Override
@@ -114,6 +115,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         });
 
+        DialogFragment dialog = new MessageFragment();
+        Bundle args = new Bundle();
+        args.putInt("layout", R.layout.dialogsignin);
+        args.putString("namePositive", "ОК");
+        args.putString("nameNeutral", "Регистрация");
+        args.putString("nameNegative", "Отмена");
+        dialog.setArguments(args);
+        dialog.setCancelable(false);
+        dialog.show(getSupportFragmentManager(), "dialogsignin");
     }
 
     public void clickTest(View view) {
@@ -139,8 +149,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         DialogFragment dialog = new MessageFragment();
         Bundle args = new Bundle();
+        args.putString("title", "Мой заголовок!");
         args.putString("message", "Привет!");
-        args.putBoolean("isPositive", true);
+        args.putString("namePositive", "ОК");
         dialog.setArguments(args);
         dialog.setCancelable(false);
         dialog.show(getSupportFragmentManager(), "dialog");
@@ -222,13 +233,22 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         switch (which) {
             case Dialog.BUTTON_POSITIVE:
+                //dialog.cancel();
+                /*DialogFragment newdialog = new MessageFragment();
+                Bundle args = new Bundle();
+                args.putInt("layout", R.layout.dialogsignin);
+                newdialog.setArguments(args);
+                newdialog.setCancelable(false);
+                newdialog.show(getSupportFragmentManager(), "dialogsignin");*/
                 Log.d(LOG_TAG, "Dialog BUTTON_POSITIVE");
                 break;
             case Dialog.BUTTON_NEGATIVE:
                 Log.d(LOG_TAG, "Dialog BUTTON_NEGATIVE");
+                finish();
                 break;
             case Dialog.BUTTON_NEUTRAL:
                 Log.d(LOG_TAG, "Dialog BUTTON_NEUTRAL");
+                //dialog.getClass().getName();
                 break;
         }
     }
