@@ -36,6 +36,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import ru.yourport.scheduler1c.ui.login.LoginActivity;
+
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener,
         DialogInterface.OnClickListener {
 
@@ -75,11 +77,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if (firebaseUser != null ) {
-
-                    Log.d("myLogs", firebaseUser.isEmailVerified() ?
+                    firebaseUser.reload();
+                    String token = firebaseUser.getIdToken(false).toString();
+                    Log.d("myLogs",
                             "Пользователь вошел в систему как " + firebaseUser.getEmail() +
-                            ", и адрес электронной почты подтвержден" :
-                            "Адрес электронной почты не подтвержден");
+                                    (firebaseUser.isEmailVerified() ?
+                            ", и адрес электронной почты подтвержден." :
+                            ". Адрес электронной почты не подтвержден!") + " TokenID=" + token);
                 } else {
                     Log.d("myLogs", "onAuthStateChanged:signed_out");
                 }
@@ -115,15 +119,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         });
 
-        DialogFragment dialog = new MessageFragment();
-        Bundle args = new Bundle();
-        args.putInt("layout", R.layout.dialogsignin);
-        args.putString("namePositive", "ОК");
-        args.putString("nameNeutral", "Регистрация");
-        args.putString("nameNegative", "Отмена");
-        dialog.setArguments(args);
-        dialog.setCancelable(false);
-        dialog.show(getSupportFragmentManager(), "dialogsignin");
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        //finish();
+//        DialogFragment dialog = new MessageFragment();
+//        Bundle args = new Bundle();
+//        args.putInt("layout", R.layout.dialogsignin);
+//        args.putString("namePositive", "ОК");
+//        args.putString("nameNeutral", "Регистрация");
+//        args.putString("nameNegative", "Отмена");
+//        dialog.setArguments(args);
+//        dialog.setCancelable(false);
+//        dialog.show(getSupportFragmentManager(), "dialogsignin");
     }
 
     public void clickTest(View view) {
@@ -312,7 +319,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                                 Toast.makeText(MainActivity.this,
                                         "Регистрация прошла успешно. Письмо с подтверждением отправлено",
                                         Toast.LENGTH_SHORT).show();
-                            }
+                                Log.w(LOG_TAG, "Регистрация прошла успешно. Письмо с подтверждением отправлено", task.getException());
+                            } else
+                                Log.w(LOG_TAG, "Не удалось отправить письмо", task.getException());
                         }
                     });
         }
@@ -333,10 +342,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(MainActivity.this,
-                                    "Перерегистрация прошла успешно", Toast.LENGTH_SHORT).show();
-                            Log.d(LOG_TAG, "Перерегистрация прошла успешно", task.getException());
+                                    "Переавторизация прошла успешно", Toast.LENGTH_SHORT).show();
+                            Log.d(LOG_TAG, "Переавторизация прошла успешно", task.getException());
                         } else {
-                            Log.d(LOG_TAG, "Перерегистрация не пройдена", task.getException());
+                            Log.d(LOG_TAG, "Переавторизация не пройдена", task.getException());
                         }
 
                     }
