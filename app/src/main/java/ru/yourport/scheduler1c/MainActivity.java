@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
-        //finish();
+        finish();
 //        DialogFragment dialog = new MessageFragment();
 //        Bundle args = new Bundle();
 //        args.putInt("layout", R.layout.dialogsignin);
