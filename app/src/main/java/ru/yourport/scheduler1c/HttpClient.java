@@ -30,10 +30,14 @@ public class HttpClient extends AsyncTask<String, Integer, String[][]> {
 
     private long TimeStart = 0, TimeEnd = 0;
     private String ERROR = "";
-    private final String URL = "https://kamaz.ddns.net:10100/testut/hs/ExchangeTFK/query";
+    private String URL = "https://kamaz.ddns.net:10100/testut/hs/ExchangeTFK/query";
     private final String LOG_TAG = "myLogs";
 
     private OkHttpClient client = new OkHttpClient();
+
+    public void setURL(String URL) {
+        this.URL = URL;
+    }
 
     public String getERROR() {
         return ERROR;
@@ -53,9 +57,12 @@ public class HttpClient extends AsyncTask<String, Integer, String[][]> {
 
     @Override
     protected String[][] doInBackground(String... strings) {
+
+        //Firebase firebase = new Firebase();
+        //String[] logpas = firebase.getServise();
         String[][] resultString = new String[0][0];
-        String LOGIN = "wsChangeServis";
-        String PASSWORD = "Service2018";
+        String LOGIN = "wsChangeServis";//logpas[0];
+        String PASSWORD = "Service2018";//;logpas[1]
         String query = strings[0];
 
         try {
@@ -138,7 +145,7 @@ public class HttpClient extends AsyncTask<String, Integer, String[][]> {
     private String run(String query) {
 
         RequestBody formBody = new FormBody.Builder()
-                .add("List", query)
+                .add("GetList", query)
                 .add("g", "test")
                 .build();
 

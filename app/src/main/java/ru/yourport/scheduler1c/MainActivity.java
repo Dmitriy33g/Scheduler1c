@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        /*mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(LOG_TAG, "Failed to read value.", databaseError.toException());
             }
-        });
+        });*/
 
         mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
