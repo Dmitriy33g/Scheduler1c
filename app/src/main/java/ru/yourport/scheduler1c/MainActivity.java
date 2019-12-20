@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     public void signIn (String email, String password) {
-        mAuth.signInWithEmailAndPassword(email, password)
+        /*mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                                     "Авторизация не пройдена", Toast.LENGTH_SHORT).show();
                         }
                     }
-                });
+                });*/
     }
 
     public void registration (final String email, final String password) {
