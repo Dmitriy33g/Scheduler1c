@@ -71,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 Log.d(LOG_TAG, "Failed to read value.", databaseError.toException());
             }
         });*/
+        Firebase firebase = new Firebase();
+        String[] servise = firebase.getServise();
+        Log.d(LOG_TAG, "log servise=" + servise[0] + ", pas servise=" + servise[1]);
 
         mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
@@ -122,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();
+
 //        DialogFragment dialog = new MessageFragment();
 //        Bundle args = new Bundle();
 //        args.putInt("layout", R.layout.dialogsignin);
