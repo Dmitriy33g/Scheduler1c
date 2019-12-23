@@ -29,6 +29,7 @@ public class Firebase {
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     Boolean result;
+    String[] dataServise = {"0", "0"};
 
     public void signIn (String email, String password) {
 
@@ -72,8 +73,7 @@ public class Firebase {
 
     public String[] getServise() {
 
-        final String[] resultat = {"0", "0"};
-        Log.d(LOG_TAG, "mDatabase начало");
+        Log.d(LOG_TAG, "getServise начало");
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -83,9 +83,9 @@ public class Firebase {
                 String valueLog = master1c.child("log").getValue(String.class);
                 String valuePas = master1c.child("pas").getValue(String.class);
                 Log.d(LOG_TAG, valueLog);
-                resultat[0] = valueLog;
-                resultat[1] = valuePas;
-                Log.d(LOG_TAG, "mDatabase результат");
+                dataServise[0] = valueLog;
+                dataServise[1] = valuePas;
+                Log.d(LOG_TAG, "getServise результат=" + dataServise);
             }
 
             @Override
@@ -96,7 +96,7 @@ public class Firebase {
 
         Thread t = new Thread(new Runnable() {
             public void run() {
-                for (int i = 0; resultat[0] == "0" && i <= 10; i++) {
+                for (int i = 0; dataServise[0] == "0" && i <= 10; i++) {
                     try {
                         TimeUnit.MILLISECONDS.sleep(500);
                         Log.d(LOG_TAG, "for service=" + i);
@@ -108,7 +108,7 @@ public class Firebase {
         });
         t.start();
 
-        return resultat;
+        return dataServise;
     }
 
     public void setResult(Boolean result) {
