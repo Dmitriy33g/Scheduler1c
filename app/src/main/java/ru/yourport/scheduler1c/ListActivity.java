@@ -261,6 +261,11 @@ public class ListActivity extends AppCompatActivity {
             //    if (i < 0) v.setTextColor(Color.RED); else
             //    if (i > 0) v.setTextColor(Color.GREEN);
             //}
+            if (v.getId() == R.id.tvTime) {
+                boolean i = text.indexOf("Набережные") > 0 || text.indexOf("Липецк") > 0;
+                if (i == true) v.setTextColor(Color.BLUE);
+                else v.setTextColor(v.getTextColors());
+            }
         }
 
         @Override
