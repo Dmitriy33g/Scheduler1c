@@ -131,6 +131,69 @@
         app:layout_constraintStart_toEndOf="@+id/button"
         app:layout_constraintTop_toBottomOf="@+id/btnSoap" />
 
+    <Button
+        android:id="@+id/btnSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickSettings"
+        android:text="@string/title_activity_settings"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnHttp" />
+
+    <Button
+        android:id="@+id/btnNavigation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickNavigation"
+        android:text="@string/nav_header_desc"
+        app:layout_constraintStart_toEndOf="@+id/btnSettings"
+        app:layout_constraintTop_toBottomOf="@+id/btnHttp" />
+
+    <Button
+        android:id="@+id/btnBasic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickBasic"
+        android:text="Basic activity"
+        app:layout_constraintStart_toEndOf="@+id/btnNavigation"
+        app:layout_constraintTop_toBottomOf="@+id/btnHttp" />
+
+    <Button
+        android:id="@+id/btnEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickEmpty"
+        android:text="Empty activity"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSettings" />
+
+    <Button
+        android:id="@+id/btnFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickFragment"
+        android:text="Fragment activity"
+        app:layout_constraintStart_toEndOf="@+id/btnEmpty"
+        app:layout_constraintTop_toBottomOf="@+id/btnNavigation" />
+
+    <Button
+        android:id="@+id/btnScrolling"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickScrolling"
+        android:text="Scrolling"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnEmpty" />
+
+    <Button
+        android:id="@+id/btnFullscreen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickFullscreen"
+        android:text="Fullscreen"
+        app:layout_constraintStart_toEndOf="@+id/btnScrolling"
+        app:layout_constraintTop_toBottomOf="@+id/btnFragment" />
+
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"

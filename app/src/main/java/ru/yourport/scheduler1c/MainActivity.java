@@ -356,6 +356,41 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 });
     }
 
+    public void onClickSettings(View view) {
+        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClickNavigation(View view) {
+        Intent intent = new Intent(getApplicationContext(), NavigationActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClickBasic(View view) {
+        Intent intent = new Intent(getApplicationContext(), BasicActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClickEmpty(View view) {
+        Intent intent = new Intent(getApplicationContext(), EmptyActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClickFragment(View view) {
+        Intent intent = new Intent(getApplicationContext(), FragmentActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClickScrolling(View view) {
+        Intent intent = new Intent(getApplicationContext(), ScrollingActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClickFullscreen(View view) {
+        Intent intent = new Intent(getApplicationContext(), FullscreenActivity.class);
+        startActivity(intent);
+    }
+
     public class User {
 
         public String username;
