@@ -12,9 +12,22 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ItemMasterListActivity"
+            android:label="@string/title_itemmaster_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".ItemMasterDetailActivity"
+            android:label="@string/title_itemmaster_detail"
+            android:parentActivityName=".ItemMasterListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ru.yourport.scheduler1c.ItemMasterListActivity" />
+        </activity>
+        <activity
             android:name=".TabsActivity"
             android:label="@string/title_activity_tabs"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".BottomActivity"
             android:label="@string/title_activity_bottom" />
