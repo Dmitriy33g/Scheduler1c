@@ -117,7 +117,9 @@ public class DataLoader extends AsyncTask<String, Integer, String[][]>{
             ERROR = "Не определен хост";
         } else if (indexPort > -1) {
             ERROR = "Не определен порт хоста";
-        } else if (index404 > -1 || index405 > -1) {
+        } else if (index404 > -1) {
+            ERROR = "Не верный запрос адреса";
+        } else if (index405 > -1) {
             ERROR = "Не верный запрос";
         }
 

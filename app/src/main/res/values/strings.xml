@@ -32,7 +32,7 @@
     </string>
     <string name="attachment_summary_off">Загружать вложения можно только по запросу вручную</string>
 
-    <string name="title_activity_navigation">NavigationActivity</string>
+    <string name="title_activity_navigation">Navigation Activity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -46,8 +46,8 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
-    <string name="title_activity_basic">BasicActivity</string>
-    <string name="title_activity_scrolling">ScrollingActivity</string>
+    <string name="title_activity_basic">Basic Activity</string>
+    <string name="title_activity_scrolling">Scrolling Activity</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -138,7 +138,14 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
 
-    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="title_activity_fullscreen">Fullscreen Activity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_bottom">Bottom Activity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_activity_tabs">Tabs Activity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 </resources>

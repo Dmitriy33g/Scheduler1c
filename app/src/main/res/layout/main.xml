@@ -13,8 +13,10 @@
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@mipmap/ic_fon_foreground" />
 
     <TextView
@@ -154,7 +156,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onClickBasic"
-        android:text="Basic activity"
+        android:text="@string/title_activity_basic"
         app:layout_constraintStart_toEndOf="@+id/btnNavigation"
         app:layout_constraintTop_toBottomOf="@+id/btnHttp" />
 
@@ -181,7 +183,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onClickScrolling"
-        android:text="Scrolling"
+        android:text="@string/title_activity_scrolling"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnEmpty" />
 
@@ -190,9 +192,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onClickFullscreen"
-        android:text="Fullscreen"
+        android:text="@string/title_activity_fullscreen"
         app:layout_constraintStart_toEndOf="@+id/btnScrolling"
         app:layout_constraintTop_toBottomOf="@+id/btnFragment" />
+
+    <Button
+        android:id="@+id/btnBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickBottom"
+        android:text="@string/title_activity_bottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnScrolling" />
+
+    <Button
+        android:id="@+id/btnTabs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickTabs"
+        android:text="@string/title_activity_tabs"
+        app:layout_constraintStart_toEndOf="@+id/btnBottom"
+        app:layout_constraintTop_toBottomOf="@+id/btnFullscreen" />
 
     <Spinner
         android:id="@+id/spinner"

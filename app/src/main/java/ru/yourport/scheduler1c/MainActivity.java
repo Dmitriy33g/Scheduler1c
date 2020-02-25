@@ -391,6 +391,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         startActivity(intent);
     }
 
+    public void onClickBottom(View view) {
+        Intent intent = new Intent(getApplicationContext(), BottomActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClickTabs(View view) {
+        Intent intent = new Intent(getApplicationContext(), TabsActivity.class);
+        startActivity(intent);
+    }
+
     public class User {
 
         public String username;
